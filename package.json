@@ -14,8 +14,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "sentry-issues.helloWorld",
-        "title": "Hello World"
+        "command": "sentry-issues.refresh",
+        "title": "Sentry: Refresh"
       }
     ]
   },
