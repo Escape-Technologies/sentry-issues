@@ -20,6 +20,7 @@ export const refresh = async () => {
 
 const configurationSchema = z.object({
   api_key: z.string(),
+  organization: z.string(),
   url: z.string(),
 });
 
@@ -45,6 +46,20 @@ const main = async (logger: vscode.LogOutputChannel) => {
   if (!config) {
     return;
   }
-  const puller = new SentryPuller(logger, config.api_key, config.url);
-  throw new Error("Not implemented");
+  const puller = new SentryPuller({
+    logger,
+    ...config,
+  });
+  //const projects = await puller.GETProjects();
+  const projects = [{ slug: "oracle" }];
+  const issues = await puller.GETIssues(projects[0].slug);
+  logger.info(`Found ${issues.length} issues`);
+  // const issues = [
+  //   {
+  //     id: "6263089229",
+  //     title: "Failed to parse specification",
+  //     culprit: "scanner.main in setup",
+  //     permalink: "https://escapetech.sentry.io/issues/6263089229/",
+  //   },
+  // ];
 };
