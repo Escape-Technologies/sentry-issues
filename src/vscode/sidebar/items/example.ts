@@ -1,6 +1,6 @@
 import { SentryItem, SentryItemData } from "../../sentryItem";
 
-class ExampleSentryItem extends SentryItem {
+export class ExampleSentryItem extends SentryItem {
   private readonly deep: number;
   constructor(data: SentryItemData & { deep?: number }) {
     super(data);
