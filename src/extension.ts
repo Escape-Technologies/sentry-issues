@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import { SentryTreeDataProvider } from "./vscode/sidebar/sidebar";
 import { CredentialsProvider } from "./vscode/creds";
 import { EventDetailsViewProvider } from "./vscode/sidebar/eventDetails";
-import { SentryEventT } from "./api/types";
+import { SentryEvent, SentryEventData } from "./vscode/sidebar/items/event";
 
 export function activate(context: vscode.ExtensionContext) {
   const logger = vscode.window.createOutputChannel("Sentry Issues", { log: true });
@@ -26,7 +26,7 @@ export function activate(context: vscode.ExtensionContext) {
       });
       treeDataProvider.updateFilter(text ?? "");
     }),
-    vscode.commands.registerCommand("sentry-issues.showEvent", (event: SentryEventT) => {
+    vscode.commands.registerCommand("sentry-issues.showEvent", (event: SentryEventData) => {
       eventDetailsProvider.showEvent(event);
     })
   );

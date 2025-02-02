@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { SentryEventT } from "../../api/types";
+import { SentryEventData } from "./items/event";
 
 export class EventDetailsViewProvider implements vscode.WebviewViewProvider {
   private _view?: vscode.WebviewView;
@@ -20,7 +20,7 @@ export class EventDetailsViewProvider implements vscode.WebviewViewProvider {
     this.updateContent();
   }
 
-  private updateContent(event?: SentryEventT) {
+  private updateContent(event?: SentryEventData) {
     if (!this._view) {
       return;
     }
@@ -47,7 +47,7 @@ export class EventDetailsViewProvider implements vscode.WebviewViewProvider {
     `;
   }
 
-  public showEvent(event: SentryEventT) {
+  public showEvent(event: SentryEventData) {
     this.updateContent(event);
   }
 }

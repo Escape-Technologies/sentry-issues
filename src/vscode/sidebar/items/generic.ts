@@ -8,7 +8,7 @@ export type SentryItemData = {
 };
 
 export abstract class SentryItem extends vscode.TreeItem {
-  constructor(protected readonly data: SentryItemData) {
+  constructor(data: SentryItemData) {
     super(data.name, data.leaf ? vscode.TreeItemCollapsibleState.None : vscode.TreeItemCollapsibleState.Collapsed);
   }
 

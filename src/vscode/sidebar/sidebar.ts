@@ -49,7 +49,7 @@ export class SentryTreeDataProvider implements vscode.TreeDataProvider<SentryIte
       this.projects = await this.puller.GETProjects();
     }
     return this.projects
-      .filter((project) => project.slug.includes(this.filterText.toLowerCase()))
+      .filter((project) => project.slug.includes(this.filterText))
       .map((project) => new SentryProject(this.puller, project));
   }
 

@@ -47,7 +47,6 @@ const breadcrumbs = z.object({
 
 export const SentryEventSchema = z.object({
   id: z.string(),
-  eventID: z.string(),
   dateCreated: z.string(),
   entries: z.array(z.discriminatedUnion("type", [exception, breadcrumbs])),
 });

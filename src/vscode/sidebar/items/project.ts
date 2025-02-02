@@ -6,7 +6,7 @@ import { SentryProjectT } from "../../../api/types.js";
 export class SentryProject extends SentryItem {
   constructor(
     private readonly puller: SentryPuller,
-    private readonly project: SentryProjectT
+    public readonly project: SentryProjectT
   ) {
     super({
       puller,
@@ -17,6 +17,6 @@ export class SentryProject extends SentryItem {
 
   public async getChildrens(): Promise<SentryItem[]> {
     const issues = await this.puller.GETIssues(this.project.slug);
-    return issues.map((issue) => new SentryIssue(this.puller, issue));
+    return issues.map((issue) => new SentryIssue(this.puller, issue, this.project));
   }
 }

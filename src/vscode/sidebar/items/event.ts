@@ -1,11 +1,19 @@
 import { SentryItem } from "./generic.js";
 import { SentryPuller } from "../../../api/index.js";
-import { SentryEventT } from "../../../api/types.js";
+import { SentryEventT, SentryIssueT, SentryProjectT } from "../../../api/types.js";
+
+export type SentryEventData = {
+  event: SentryEventT;
+  issue: SentryIssueT;
+  project: SentryProjectT;
+};
 
 export class SentryEvent extends SentryItem {
   constructor(
     private readonly puller: SentryPuller,
-    private readonly event: SentryEventT
+    public readonly event: SentryEventT,
+    public readonly issue: SentryIssueT,
+    public readonly project: SentryProjectT
   ) {
     super({
       puller,
@@ -15,7 +23,13 @@ export class SentryEvent extends SentryItem {
     this.command = {
       command: "sentry-issues.showEvent",
       title: "Show Event Details",
-      arguments: [event],
+      arguments: [
+        {
+          event: this.event,
+          issue: this.issue,
+          project: this.project,
+        },
+      ],
     };
   }
 
