@@ -12,6 +12,11 @@ export class SentryEvent extends SentryItem {
       name: new Date(event.dateCreated).toLocaleString(),
       leaf: true,
     });
+    this.command = {
+      command: "sentry-issues.showEvent",
+      title: "Show Event Details",
+      arguments: [event],
+    };
   }
 
   public async getChildrens(): Promise<SentryItem[]> {

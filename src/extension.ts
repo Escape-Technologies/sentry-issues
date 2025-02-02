@@ -1,50 +1,35 @@
 import * as vscode from "vscode";
-import { SentryTreeDataProvider } from "./vscode/sidebar/sidebar.js";
-import { CredentialsProvider } from "./vscode/creds.js";
+import { SentryTreeDataProvider } from "./vscode/sidebar/sidebar";
+import { CredentialsProvider } from "./vscode/creds";
+import { EventDetailsViewProvider } from "./vscode/sidebar/eventDetails";
+import { SentryEventT } from "./api/types";
 
-export async function activate(context: vscode.ExtensionContext) {
-  const logger = vscode.window.createOutputChannel("Sentry Issues", {
-    log: true,
-  });
+export function activate(context: vscode.ExtensionContext) {
+  const logger = vscode.window.createOutputChannel("Sentry Issues", { log: true });
   const credProvider = new CredentialsProvider(context);
   const treeDataProvider = new SentryTreeDataProvider(logger, credProvider);
+  const eventDetailsProvider = new EventDetailsViewProvider(context.extensionUri);
 
   context.subscriptions.push(
+    vscode.window.registerTreeDataProvider("sentryIssuesSidebar.sidebar", treeDataProvider),
+    vscode.window.registerWebviewViewProvider("sentryIssuesSidebar.eventDetails", eventDetailsProvider),
+    vscode.commands.registerCommand("sentry-issues.refresh", () => treeDataProvider.refresh()),
     vscode.commands.registerCommand("sentry-issues.reset", async () => {
       await credProvider.reset();
-      await credProvider.forceConfigure();
       treeDataProvider.cleanCache();
-      treeDataProvider.refresh();
-    })
-  );
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand("sentry-issues.refresh", async () => {
-      await credProvider.forceConfigure();
-      treeDataProvider.cleanCache();
-      treeDataProvider.refresh();
-    })
-  );
-
-  const treeView = vscode.window.createTreeView("sentryIssuesSidebar.sidebar", {
-    treeDataProvider,
-    showCollapseAll: true,
-  });
-
-  context.subscriptions.push(
+      await treeDataProvider.refresh();
+    }),
     vscode.commands.registerCommand("sentry-issues.filter", async () => {
-      const searchText = await vscode.window.showInputBox({
-        placeHolder: "Filter projects...",
-        prompt: "Enter text to filter projects",
+      const text = await vscode.window.showInputBox({
+        prompt: "Filter projects",
+        value: "",
       });
-
-      if (searchText !== undefined) {
-        treeDataProvider.updateFilter(searchText);
-      }
+      treeDataProvider.updateFilter(text ?? "");
+    }),
+    vscode.commands.registerCommand("sentry-issues.showEvent", (event: SentryEventT) => {
+      eventDetailsProvider.showEvent(event);
     })
   );
-
-  context.subscriptions.push(treeView, logger);
 }
 
 export function deactivate() {}
