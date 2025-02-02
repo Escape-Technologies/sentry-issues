@@ -1,6 +1,7 @@
 import { SentryItem } from "../../sentryItem.js";
 import { SentryPuller } from "../../../api/index.js";
 import { SentryIssueT } from "../../../api/types.js";
+import { SentryEvent } from "./event.js";
 
 export class SentryIssue extends SentryItem {
   constructor(
@@ -10,11 +11,12 @@ export class SentryIssue extends SentryItem {
     super({
       puller,
       name: issue.title,
-      leaf: true,
+      leaf: false,
     });
   }
 
   public async getChildrens(): Promise<SentryItem[]> {
-    return [];
+    const events = await this.puller.GETEvents(this.issue.id);
+    return events.map((event) => new SentryEvent(this.puller, event));
   }
 }

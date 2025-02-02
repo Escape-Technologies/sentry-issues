@@ -12,3 +12,10 @@ export const SentryIssueSchema = z.object({
   permalink: z.string(),
 });
 export type SentryIssueT = z.infer<typeof SentryIssueSchema>;
+
+export const SentryEventSchema = z.object({
+  id: z.string(),
+  eventID: z.string(),
+  dateCreated: z.string(),
+});
+export type SentryEventT = z.infer<typeof SentryEventSchema>;

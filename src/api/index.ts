@@ -1,7 +1,11 @@
 import * as vscode from "vscode";
 import { z, ZodType } from "zod";
 import { getNextPage } from "./link";
-import { SentryProjectSchema, SentryIssueSchema } from "./types";
+import {
+  SentryProjectSchema,
+  SentryIssueSchema,
+  SentryEventSchema,
+} from "./types";
 import { CredentialsProvider } from "../extension/creds";
 
 export class SentryPuller {
@@ -71,15 +75,28 @@ export class SentryPuller {
     ).flat();
   }
 
-  async GETIssues(id: string) {
+  async GETIssues(projectId: string) {
     const creds = await this.credProvider.configure();
     if (!creds) {
       return [];
     }
     return (
       await this.GET(
-        `${creds.url}/api/0/projects/${creds.organization}/${id}/issues/`,
+        `${creds.url}/api/0/projects/${creds.organization}/${projectId}/issues/`,
         z.array(SentryIssueSchema)
+      )
+    ).flat();
+  }
+
+  async GETEvents(issueId: string) {
+    const creds = await this.credProvider.configure();
+    if (!creds) {
+      return [];
+    }
+    return (
+      await this.GET(
+        `${creds.url}/api/0/issues/${issueId}/events/`,
+        z.array(SentryEventSchema)
       )
     ).flat();
   }
