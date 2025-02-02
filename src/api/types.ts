@@ -16,8 +16,9 @@ export type SentryIssueT = z.infer<typeof SentryIssueSchema>;
 // https://zodjs.netlify.app/guide/recursive-types
 const literalSchema = z.string();
 type Literal = z.infer<typeof literalSchema>;
-type vars = Literal | { [key: string]: vars } | vars[];
-const varsSchema: z.ZodType<vars> = z.lazy(() => z.union([literalSchema, z.array(varsSchema), z.record(varsSchema)]));
+type varsT = Literal | { [key: string]: varsT } | varsT[];
+const varsSchema: z.ZodType<varsT> = z.lazy(() => z.union([literalSchema, z.array(varsSchema), z.record(varsSchema)]));
+const vars = z.record(z.string(), varsSchema);
 
 const exception = z.object({
   type: z.literal("exception"),
@@ -31,7 +32,7 @@ const exception = z.object({
             z.object({
               absPath: z.string(),
               lineno: z.number().optional(),
-              vars: z.record(z.string(), varsSchema).nullable(),
+              vars: vars.nullable(),
             })
           ),
         }),
@@ -39,15 +40,17 @@ const exception = z.object({
     ),
   }),
 });
+export type SentryExceptionFrameT = z.infer<typeof exception>["data"]["values"][number]["stacktrace"]["frames"][number];
+export type SentryExceptionFrameVarsT = z.infer<typeof vars>;
 
 const breadcrumbs = z.object({
   type: z.literal("breadcrumbs"),
-  data: z.object({}),
 });
 
 export const SentryEventSchema = z.object({
   id: z.string(),
   dateCreated: z.string(),
   entries: z.array(z.discriminatedUnion("type", [exception, breadcrumbs])),
+  tags: z.array(z.object({ key: z.string(), value: z.string() })),
 });
 export type SentryEventT = z.infer<typeof SentryEventSchema>;

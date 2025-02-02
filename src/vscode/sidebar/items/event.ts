@@ -1,6 +1,7 @@
-import { SentryItem } from "./generic.js";
 import { SentryPuller } from "../../../api/index.js";
 import { SentryEventT, SentryIssueT, SentryProjectT } from "../../../api/types.js";
+import { SentryEventFrame } from "./eventFrame.js";
+import { SentryItem } from "./generic.js";
 
 export type SentryEventData = {
   event: SentryEventT;
@@ -15,10 +16,11 @@ export class SentryEvent extends SentryItem {
     public readonly issue: SentryIssueT,
     public readonly project: SentryProjectT
   ) {
+    const environment = event.tags.find((tag) => tag.key === "environment")?.value || "unknown";
     super({
       puller,
-      name: new Date(event.dateCreated).toLocaleString(),
-      leaf: true,
+      name: environment + " " + new Date(event.dateCreated).toLocaleString(),
+      leaf: false,
     });
     this.command = {
       command: "sentry-issues.showEvent",
@@ -34,6 +36,9 @@ export class SentryEvent extends SentryItem {
   }
 
   public async getChildrens(): Promise<SentryItem[]> {
-    return [];
+    const exception = this.event.entries.find((entry) => entry.type === "exception")?.data.values;
+    if (!exception) return [];
+    const frames = exception.flatMap((entry) => entry.stacktrace.frames);
+    return frames.map((frame) => new SentryEventFrame(this.puller, frame, this.event, this.issue, this.project));
   }
 }

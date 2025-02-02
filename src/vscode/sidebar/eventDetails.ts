@@ -43,18 +43,31 @@ export class EventDetailsViewProvider implements vscode.WebviewViewProvider {
   }
 
   private display(data: SentryEventData): string {
+    const environment = data.event.tags.find((tag) => tag.key === "environment")?.value || "unknown";
+
     const fullIssues = data.event.entries
       .filter((entry) => entry.type === "exception")
       .flatMap((entry) => entry.data.values)
-      .flatMap((value) => /*html*/ `<pre>${value.value}</pre>`)
-      .join("\n");
+      .flatMap((value) => /*html*/ `<pre>${value.value}</pre>`);
+
+    const li = [
+      /*html*/ `<a href="${data.issue.permalink + "events/" + data.event.id}" target="_blank">View it on Sentry</a>`,
+    ];
+    const kafkaUrl = data.event.tags.find((tag) => tag.key === "kafka.url")?.value;
+    if (kafkaUrl) {
+      li.push(/*html*/ `<a href="${kafkaUrl}" target="_blank">View it on Kafka</a>`);
+    }
+    const release = data.event.tags.find((tag) => tag.key === "release")?.value;
+    if (release) {
+      li.push(/*html*/ `Release: ${release}`);
+    }
 
     return /*html*/ `
-        <h1>${data.issue.title}</h1>
-        ${fullIssues}
-        <p>
-          <a href="${data.issue.permalink + "events/" + data.event.id}" target="_blank">View it on Sentry</a>
-        </p>
+        <h1>${data.issue.title + " - " + environment}</h1>
+        ${fullIssues.join("\n")}
+        <ul>
+            ${li.map((l) => `<li>${l}</li>`).join("\n")}
+        </ul>
     `;
   }
 
