@@ -31,7 +31,7 @@ const exception = z.object({
             z.object({
               absPath: z.string(),
               lineno: z.number().optional(),
-              vars: z.record(z.string(), varsSchema),
+              vars: z.record(z.string(), varsSchema).nullable(),
             })
           ),
         }),
