@@ -20,16 +20,11 @@ export class EventDetailsViewProvider implements vscode.WebviewViewProvider {
     this.updateContent();
   }
 
-  private updateContent(event?: SentryEventData) {
+  private updateContent(data?: SentryEventData) {
     if (!this._view) {
       return;
     }
-
-    const content = event
-      ? `<pre>${JSON.stringify(event, null, 2)}</pre>`
-      : '<div style="padding: 20px;">Select an event to view details</div>';
-
-    this._view.webview.html = `
+    this._view.webview.html = /*html*/ `
       <!DOCTYPE html>
       <html>
         <head>
@@ -41,13 +36,29 @@ export class EventDetailsViewProvider implements vscode.WebviewViewProvider {
           </style>
         </head>
         <body>
-          ${content}
+          ${data ? this.display(data) : "Select an event to view details"}
         </body>
       </html>
     `;
   }
 
-  public showEvent(event: SentryEventData) {
-    this.updateContent(event);
+  private display(data: SentryEventData): string {
+    const fullIssues = data.event.entries
+      .filter((entry) => entry.type === "exception")
+      .flatMap((entry) => entry.data.values)
+      .flatMap((value) => /*html*/ `<pre>${value.value}</pre>`)
+      .join("\n");
+
+    return /*html*/ `
+        <h1>${data.issue.title}</h1>
+        ${fullIssues}
+        <p>
+          <a href="${data.issue.permalink + "events/" + data.event.id}" target="_blank">View it on Sentry</a>
+        </p>
+    `;
+  }
+
+  public showEvent(data: SentryEventData) {
+    this.updateContent(data);
   }
 }
