@@ -95,7 +95,7 @@ export class SentryPuller {
     }
     return (
       await this.GET(
-        `${creds.url}/api/0/issues/${issueId}/events/`,
+        `${creds.url}/api/0/issues/${issueId}/events/?full=true&environment=prod`,
         z.array(SentryEventSchema)
       )
     ).flat();
