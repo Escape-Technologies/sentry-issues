@@ -39,7 +39,9 @@ export class SentryTreeDataProvider
   // Add filter state
   private filterText: string = "";
 
-  constructor(private readonly puller: SentryPuller) {}
+  constructor(
+    private readonly getPuller: () => Promise<SentryPuller | undefined>
+  ) {}
 
   // Add method to update filter
   public updateFilter(text: string) {
@@ -50,7 +52,7 @@ export class SentryTreeDataProvider
   /**
    * Refresh the tree (e.g., when the user clicks a Refresh button).
    */
-  refresh(): void {
+  async refresh(): Promise<void> {
     this._onDidChangeTreeData.fire();
   }
 
@@ -59,9 +61,14 @@ export class SentryTreeDataProvider
    */
   public async getChildren(element?: SentryItem): Promise<SentryItem[]> {
     try {
+      const puller = await this.getPuller();
+      if (!puller) {
+        return [];
+      }
+
       if (!element) {
         // Root level - fetch projects
-        const projects = await this.puller.GETProjects();
+        const projects = await puller.GETProjects();
         return projects
           .filter(
             (project) =>
@@ -78,7 +85,7 @@ export class SentryTreeDataProvider
           );
       } else {
         // Issue level - fetch issues for the project
-        const issues = await this.puller.GETIssues(element.slug!);
+        const issues = await puller.GETIssues(element.slug!);
         return issues.map(
           (issue) =>
             new SentryItem(
