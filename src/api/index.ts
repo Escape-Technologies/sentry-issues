@@ -1,10 +1,7 @@
 import * as vscode from "vscode";
 import { z, ZodType } from "zod";
 import { getNextPage } from "./link";
-import {
-  SentryProjectResponseSchema,
-  SentryIssueResponseSchema,
-} from "./types";
+import { SentryProjectSchema, SentryIssueSchema } from "./types";
 import { CredentialsProvider } from "../extension/creds";
 
 export class SentryPuller {
@@ -69,7 +66,7 @@ export class SentryPuller {
     return (
       await this.GET(
         `${creds.url}/api/0/projects/`,
-        z.array(SentryProjectResponseSchema)
+        z.array(SentryProjectSchema)
       )
     ).flat();
   }
@@ -82,7 +79,7 @@ export class SentryPuller {
     return (
       await this.GET(
         `${creds.url}/api/0/projects/${creds.organization}/${id}/issues/`,
-        z.array(SentryIssueResponseSchema)
+        z.array(SentryIssueSchema)
       )
     ).flat();
   }

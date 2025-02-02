@@ -1,7 +1,9 @@
 import * as vscode from "vscode";
-import { SentryPuller } from "../api/index";
-import { SentryItem, SentryItemData } from "../vscode/sentryItem";
-import { CredentialsProvider } from "./creds";
+import { SentryPuller } from "../../api/index";
+import { SentryItem, SentryItemData } from "../sentryItem";
+import { CredentialsProvider } from "../../extension/creds";
+import { SentryProject } from "./items/project";
+import { SentryProjectT } from "../../api/types";
 
 class ExampleSentryItem extends SentryItem {
   private readonly deep: number;
@@ -60,16 +62,18 @@ export class SentryTreeDataProvider
     }
   }
 
+  private projects: SentryProjectT[] = [];
+  public cleanCache() {
+    this.projects = [];
+  }
+
   public async getRootItems(): Promise<SentryItem[]> {
-    if (!this.puller) {
-      return [];
+    if (this.projects.length === 0) {
+      this.projects = await this.puller.GETProjects();
     }
-    return [
-      new ExampleSentryItem({
-        name: "Example",
-        puller: this.puller,
-      }),
-    ];
+    return this.projects
+      .filter((project) => project.slug.includes(this.filterText.toLowerCase()))
+      .map((project) => new SentryProject(this.puller, project));
   }
 
   private filterText: string = "";

@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { SentryTreeDataProvider } from "./extension/sidebar.js";
+import { SentryTreeDataProvider } from "./vscode/sidebar/sidebar.js";
 import { CredentialsProvider } from "./extension/creds.js";
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -13,6 +13,15 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("sentry-issues.reset", async () => {
       await credProvider.reset();
       await credProvider.forceConfigure();
+      treeDataProvider.cleanCache();
+      treeDataProvider.refresh();
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand("sentry-issues.refresh", async () => {
+      await credProvider.forceConfigure();
+      treeDataProvider.cleanCache();
       treeDataProvider.refresh();
     })
   );
