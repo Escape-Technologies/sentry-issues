@@ -1,4 +1,4 @@
-import { SentryItem } from "../../sentryItem.js";
+import { SentryItem } from "./generic.js";
 import { SentryPuller } from "../../../api/index.js";
 import { SentryIssueT } from "../../../api/types.js";
 import { SentryEvent } from "./event.js";

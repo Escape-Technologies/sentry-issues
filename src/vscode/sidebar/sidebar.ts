@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { SentryPuller } from "../../api/index";
-import { SentryItem, SentryItemData } from "../sentryItem";
+import { SentryItem, SentryItemData } from "./items/generic";
 import { CredentialsProvider } from "../../extension/creds";
 import { SentryProject } from "./items/project";
 import { SentryProjectT } from "../../api/types";

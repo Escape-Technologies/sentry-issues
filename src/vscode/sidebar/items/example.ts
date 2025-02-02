@@ -1,4 +1,4 @@
-import { SentryItem, SentryItemData } from "../../sentryItem";
+import { SentryItem, SentryItemData } from "./generic";
 
 export class ExampleSentryItem extends SentryItem {
   private readonly deep: number;

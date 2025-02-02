@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { SentryPuller } from "../api/index.js";
+import { SentryPuller } from "../../../api/index.js";
 
 export type SentryItemData = {
   puller: SentryPuller;
