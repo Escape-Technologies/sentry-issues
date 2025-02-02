@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { SentryTreeDataProvider } from "./vscode/sidebar/sidebar.js";
-import { CredentialsProvider } from "./extension/creds.js";
+import { CredentialsProvider } from "./vscode/creds.js";
 
 export async function activate(context: vscode.ExtensionContext) {
   const logger = vscode.window.createOutputChannel("Sentry Issues", {

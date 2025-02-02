@@ -6,7 +6,7 @@ import {
   SentryIssueSchema,
   SentryEventSchema,
 } from "./types";
-import { CredentialsProvider } from "../extension/creds";
+import { CredentialsProvider } from "../vscode/creds";
 
 export class SentryPuller {
   constructor(
