@@ -88,6 +88,7 @@
     "watch": "tsc -watch -p ./",
     "pretest": "yarn run compile && yarn run lint",
     "lint": "eslint src",
+    "fmt": "prettier --write .",
     "test": "vscode-test"
   },
   "devDependencies": {
@@ -99,6 +100,7 @@
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.4.1",
     "eslint": "^9.16.0",
+    "prettier": "^3.4.2",
     "typescript": "^5.7.2"
   },
   "dependencies": {

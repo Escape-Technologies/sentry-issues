@@ -5,14 +5,11 @@ import { CredentialsProvider } from "../creds";
 import { SentryProject } from "./items/project";
 import { SentryProjectT } from "../../api/types";
 
-export class SentryTreeDataProvider
-  implements vscode.TreeDataProvider<SentryItem>
-{
-  private _onDidChangeTreeData: vscode.EventEmitter<
+export class SentryTreeDataProvider implements vscode.TreeDataProvider<SentryItem> {
+  private _onDidChangeTreeData: vscode.EventEmitter<SentryItem | undefined | void> = new vscode.EventEmitter<
     SentryItem | undefined | void
-  > = new vscode.EventEmitter<SentryItem | undefined | void>();
-  readonly onDidChangeTreeData: vscode.Event<SentryItem | undefined | void> =
-    this._onDidChangeTreeData.event;
+  >();
+  readonly onDidChangeTreeData: vscode.Event<SentryItem | undefined | void> = this._onDidChangeTreeData.event;
 
   public getTreeItem(element: SentryItem): vscode.TreeItem {
     return element;

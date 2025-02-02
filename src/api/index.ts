@@ -1,11 +1,7 @@
 import * as vscode from "vscode";
 import { z, ZodType } from "zod";
 import { getNextPage } from "./link";
-import {
-  SentryProjectSchema,
-  SentryIssueSchema,
-  SentryEventSchema,
-} from "./types";
+import { SentryProjectSchema, SentryIssueSchema, SentryEventSchema } from "./types";
 import { CredentialsProvider } from "../vscode/creds";
 
 export class SentryPuller {
@@ -23,11 +19,7 @@ export class SentryPuller {
     if (!creds) {
       throw new Error("No credentials found");
     }
-    if (
-      this.remaining === 0 &&
-      this.reset !== null &&
-      this.reset > new Date()
-    ) {
+    if (this.remaining === 0 && this.reset !== null && this.reset > new Date()) {
       const delay = this.reset.getTime() - new Date().getTime();
       this.logger.debug(`Rate limit reached, waiting ${delay}ms...`);
       await new Promise((resolve) => setTimeout(resolve, delay));
@@ -39,12 +31,8 @@ export class SentryPuller {
         Authorization: `Bearer ${creds.apiKey}`,
       },
     });
-    this.remaining = Number(
-      response.headers.get("X-Sentry-Rate-Limit-Remaining")
-    );
-    this.reset = new Date(
-      Number(response.headers.get("X-Sentry-Rate-Limit-Reset")) * 1000
-    );
+    this.remaining = Number(response.headers.get("X-Sentry-Rate-Limit-Remaining"));
+    this.reset = new Date(Number(response.headers.get("X-Sentry-Rate-Limit-Reset")) * 1000);
     return response;
   }
 
@@ -67,12 +55,7 @@ export class SentryPuller {
     if (!creds) {
       return [];
     }
-    return (
-      await this.GET(
-        `${creds.url}/api/0/projects/`,
-        z.array(SentryProjectSchema)
-      )
-    ).flat();
+    return (await this.GET(`${creds.url}/api/0/projects/`, z.array(SentryProjectSchema))).flat();
   }
 
   async GETIssues(projectId: string) {

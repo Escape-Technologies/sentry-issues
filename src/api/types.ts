@@ -17,9 +17,7 @@ export type SentryIssueT = z.infer<typeof SentryIssueSchema>;
 const literalSchema = z.string();
 type Literal = z.infer<typeof literalSchema>;
 type vars = Literal | { [key: string]: vars } | vars[];
-const varsSchema: z.ZodType<vars> = z.lazy(() =>
-  z.union([literalSchema, z.array(varsSchema), z.record(varsSchema)])
-);
+const varsSchema: z.ZodType<vars> = z.lazy(() => z.union([literalSchema, z.array(varsSchema), z.record(varsSchema)]));
 
 const exception = z.object({
   type: z.literal("exception"),
