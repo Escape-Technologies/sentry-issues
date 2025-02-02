@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import { z } from "zod";
 import { SentryPuller } from "../api";
+import { loadConfiguration } from "../api/config";
 
 export const refresh = async () => {
   const logger = vscode.window.createOutputChannel("Sentry Issues", {
@@ -16,29 +16,6 @@ export const refresh = async () => {
       "Error loading Sentry issues, read the window logs for more informations."
     );
   }
-};
-
-const configurationSchema = z.object({
-  api_key: z.string(),
-  organization: z.string(),
-  url: z.string(),
-});
-
-const loadConfiguration = async (logger: vscode.LogOutputChannel) => {
-  let sentryIssuesUris = await vscode.workspace.findFiles(
-    "._sentry-issues.json",
-    undefined,
-    1
-  );
-  if (!sentryIssuesUris) {
-    vscode.window.showWarningMessage(
-      "File `._sentry-issues.json` not found in the workspace."
-    );
-    return;
-  }
-  logger.info(`Parsing ${sentryIssuesUris[0].fsPath}`);
-  const data = await vscode.workspace.fs.readFile(sentryIssuesUris[0]);
-  return configurationSchema.parse(JSON.parse(data.toString()));
 };
 
 const main = async (logger: vscode.LogOutputChannel) => {
