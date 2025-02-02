@@ -1,111 +1,80 @@
 import * as vscode from "vscode";
-import { SentryPuller } from "../api/index.js";
+import { SentryPuller } from "../api/index";
+import { SentryItem, SentryItemData } from "../vscode/sentryItem";
+import { CredentialsProvider } from "./creds";
 
-/**
- * Represents a single item (either a Slug or an Issue) in the tree.
- */
-class SentryItem extends vscode.TreeItem {
-  constructor(
-    public readonly label: string,
-    public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-    public readonly slug?: string,
-    public readonly permalink?: string
-  ) {
-    super(label, collapsibleState);
+class ExampleSentryItem extends SentryItem {
+  private readonly deep: number;
+  constructor(data: SentryItemData & { deep?: number }) {
+    super(data);
+    this.deep = data.deep || 10;
+  }
 
-    if (permalink) {
-      this.command = {
-        command: "vscode.open",
-        title: "Open Issue",
-        arguments: [vscode.Uri.parse(permalink)],
-      };
-    }
+  public async getChildrens(): Promise<SentryItem[]> {
+    return new Array(this.deep).fill(0).map(
+      (_, i) =>
+        new ExampleSentryItem({
+          ...this.data,
+          name: `${this.data.name} ${i}`,
+          deep: this.deep - 1,
+          leaf: this.deep === 1,
+        })
+    );
   }
 }
 
-/**
- * The TreeDataProvider that supplies Slugs and Issues.
- */
 export class SentryTreeDataProvider
   implements vscode.TreeDataProvider<SentryItem>
 {
-  // Event emitter to trigger a refresh
   private _onDidChangeTreeData: vscode.EventEmitter<
     SentryItem | undefined | void
   > = new vscode.EventEmitter<SentryItem | undefined | void>();
   readonly onDidChangeTreeData: vscode.Event<SentryItem | undefined | void> =
     this._onDidChangeTreeData.event;
 
-  // Add filter state
-  private filterText: string = "";
-
-  constructor(
-    private readonly getPuller: () => Promise<SentryPuller | undefined>
-  ) {}
-
-  // Add method to update filter
-  public updateFilter(text: string) {
-    this.filterText = text.toLowerCase();
-    this.refresh();
+  public getTreeItem(element: SentryItem): vscode.TreeItem {
+    return element;
   }
 
-  /**
-   * Refresh the tree (e.g., when the user clicks a Refresh button).
-   */
+  private readonly puller: SentryPuller;
+  constructor(
+    private readonly logger: vscode.LogOutputChannel,
+    private readonly credProvider: CredentialsProvider
+  ) {
+    this.puller = new SentryPuller(this.logger, this.credProvider);
+  }
+
   async refresh(): Promise<void> {
     this._onDidChangeTreeData.fire();
   }
 
-  /**
-   * Returns the children of a given element, or the root children if no element.
-   */
   public async getChildren(element?: SentryItem): Promise<SentryItem[]> {
+    if (!this.puller) {
+      return [];
+    }
     try {
-      const puller = await this.getPuller();
-      if (!puller) {
-        return [];
-      }
-
-      if (!element) {
-        // Root level - fetch projects
-        const projects = await puller.GETProjects();
-        return projects
-          .filter(
-            (project) =>
-              this.filterText === "" ||
-              project.slug.toLowerCase().includes(this.filterText)
-          )
-          .map(
-            (project) =>
-              new SentryItem(
-                project.slug,
-                vscode.TreeItemCollapsibleState.Collapsed,
-                project.slug
-              )
-          );
-      } else {
-        // Issue level - fetch issues for the project
-        const issues = await puller.GETIssues(element.slug!);
-        return issues.map(
-          (issue) =>
-            new SentryItem(
-              `${issue.title} (${issue.culprit})`,
-              vscode.TreeItemCollapsibleState.None,
-              undefined,
-              issue.permalink
-            )
-        );
-      }
+      return element ? element.getChildrens() : this.getRootItems();
     } catch (error) {
       vscode.window.showErrorMessage(`Failed to fetch Sentry data: ${error}`);
       return [];
     }
   }
 
-  /**
-   * Returns how the tree should present the element.
-   */
-  public getTreeItem(element: SentryItem): vscode.TreeItem {
-    return element;
+  public async getRootItems(): Promise<SentryItem[]> {
+    if (!this.puller) {
+      return [];
+    }
+    return [
+      new ExampleSentryItem({
+        name: "Example",
+        puller: this.puller,
+      }),
+    ];
+  }
+
+  private filterText: string = "";
+  public updateFilter(text: string) {
+    this.filterText = text.toLowerCase();
+    this.refresh();
   }
 }

@@ -1,34 +1,27 @@
 import * as vscode from "vscode";
 import { z, ZodType } from "zod";
 import { getNextPage } from "./link";
+import {
+  SentryProjectResponseSchema,
+  SentryIssueResponseSchema,
+} from "./types";
+import { CredentialsProvider } from "../extension/creds";
 
 export class SentryPuller {
-  private readonly logger: vscode.LogOutputChannel;
-  private readonly api_key: string;
-  private readonly org: string;
-  private readonly url: string;
+  constructor(
+    private readonly logger: vscode.LogOutputChannel,
+    private readonly credProvider: CredentialsProvider
+  ) {}
 
-  constructor(data: {
-    logger: vscode.LogOutputChannel;
-    api_key: string;
-    organization: string;
-    url: string;
-  }) {
-    this.logger = data.logger;
-    this.api_key = data.api_key;
-    this.org = data.organization;
-    this.url = data.url;
-
-    if (this.url.endsWith("/")) {
-      this.url = this.url.slice(0, -1);
-    }
-    this.logger.info(`Using sentry to ${this.url}`);
-  }
   // https://docs.sentry.io/api/ratelimits/
   private remaining: number | null = null;
   private reset: Date | null = null;
 
   private async fetch(url: string, init?: RequestInit): Promise<Response> {
+    const creds = await this.credProvider.configure();
+    if (!creds) {
+      throw new Error("No credentials found");
+    }
     if (
       this.remaining === 0 &&
       this.reset !== null &&
@@ -42,7 +35,7 @@ export class SentryPuller {
       ...init,
       headers: {
         ...init?.headers,
-        Authorization: `Bearer ${this.api_key}`,
+        Authorization: `Bearer ${creds.apiKey}`,
       },
     });
     this.remaining = Number(
@@ -69,30 +62,27 @@ export class SentryPuller {
   }
 
   async GETProjects() {
+    const creds = await this.credProvider.configure();
+    if (!creds) {
+      return [];
+    }
     return (
       await this.GET(
-        `${this.url}/api/0/projects/`,
-        z.array(
-          z.object({
-            slug: z.string(),
-          })
-        )
+        `${creds.url}/api/0/projects/`,
+        z.array(SentryProjectResponseSchema)
       )
     ).flat();
   }
 
   async GETIssues(id: string) {
+    const creds = await this.credProvider.configure();
+    if (!creds) {
+      return [];
+    }
     return (
       await this.GET(
-        `${this.url}/api/0/projects/${this.org}/${id}/issues/`,
-        z.array(
-          z.object({
-            id: z.string(),
-            title: z.string(),
-            culprit: z.string(),
-            permalink: z.string(),
-          })
-        )
+        `${creds.url}/api/0/projects/${creds.organization}/${id}/issues/`,
+        z.array(SentryIssueResponseSchema)
       )
     ).flat();
   }

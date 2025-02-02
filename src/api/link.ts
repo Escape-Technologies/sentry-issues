@@ -28,10 +28,18 @@ const linkParser = (linkHeader: string | null): linkHeaderT => {
 };
 
 export const getNextPage = (linkHeader: string | null): string | null => {
-  if (!linkHeader) return null;
+  if (!linkHeader) {
+    return null;
+  }
   const parsed = linkParser(linkHeader);
-  if (!parsed.next) return null;
-  if (!parsed.next.results) return null;
-  if (!parsed.next.url) return null;
+  if (!parsed.next) {
+    return null;
+  }
+  if (!parsed.next.results) {
+    return null;
+  }
+  if (!parsed.next.url) {
+    return null;
+  }
   return parsed.next.url;
 };

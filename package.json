@@ -15,23 +15,18 @@
     "commands": [
       {
         "command": "sentry-issues.refresh",
-        "title": "Refresh",
+        "title": "Sentry: Refresh",
         "icon": "$(refresh)"
       },
       {
         "command": "sentry-issues.filter",
-        "title": "Filter Projects",
+        "title": "Sentry: Filter Projects",
         "icon": "$(search)"
       },
       {
-        "command": "sentry-issues.resetApiKey",
-        "title": "Reset Sentry API Key",
+        "command": "sentry-issues.reset",
+        "title": "Sentry: Reset configuration",
         "icon": "$(key)"
-      },
-      {
-        "command": "sentry-issues.resetOrganization",
-        "title": "Reset Sentry Organization",
-        "icon": "$(organization)"
       }
     ],
     "viewsContainers": {
@@ -65,14 +60,9 @@
           "group": "navigation"
         },
         {
-          "command": "sentry-issues.resetApiKey",
+          "command": "sentry-issues.reset",
           "when": "view == sentryIssuesSidebar.sidebar",
           "group": "navigation@1"
-        },
-        {
-          "command": "sentry-issues.resetOrganization",
-          "when": "view == sentryIssuesSidebar.sidebar",
-          "group": "navigation@2"
         }
       ]
     },
