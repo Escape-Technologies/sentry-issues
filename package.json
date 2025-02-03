@@ -1,6 +1,6 @@
 {
   "name": "sentry-issues-viewer",
-  "displayName": "Sentry Issues",
+  "displayName": "Sentry Issues Viewer",
   "description": "View sentry issues locally",
   "publisher": "QuentinN42",
   "version": "0.0.1",
