@@ -8,6 +8,9 @@
     "type": "git",
     "url": "https://github.com/Escape-Technologies/sentry-issues"
   },
+  "bugs": {
+    "url": "https://github.com/Escape-Technologies/sentry-issues/issues"
+  },
   "icon": "assets/sentry.png",
   "engines": {
     "vscode": "^1.96.0"
