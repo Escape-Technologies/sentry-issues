@@ -17,7 +17,7 @@ export class CredentialsProvider {
 
   public async forceConfigure(): Promise<Credentials> {
     let apiKey = await this.context.secrets.get("sentry.apiKey");
-    const config = vscode.workspace.getConfiguration("sentry-issues");
+    const config = vscode.workspace.getConfiguration("sentry-issues-viewer");
     let organization = config.get<string>("organization");
 
     if (!organization) {
@@ -51,7 +51,7 @@ export class CredentialsProvider {
 
   public async configure(): Promise<Credentials | undefined> {
     let apiKey = await this.context.secrets.get("sentry.apiKey");
-    const config = vscode.workspace.getConfiguration("sentry-issues");
+    const config = vscode.workspace.getConfiguration("sentry-issues-viewer");
     let organization = config.get<string>("organization");
     if (!!apiKey && !!organization) {
       let url = config.get<string>("url") || "https://sentry.io";

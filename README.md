@@ -18,8 +18,8 @@ To setup the extension, you will need to set your Sentry API key (promted and se
 
 You also have the folowing parameters:
 
-- `sentry-issues.organization`: Sentry Organization Slug.
-- `sentry-issues.url`: Sentry Instance URL (default: `https://sentry.io`).
+- `sentry-issues-viewer.organization`: Sentry Organization Slug.
+- `sentry-issues-viewer.url`: Sentry Instance URL (default: `https://sentry.io`).
 
 ## Release Notes
 

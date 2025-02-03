@@ -23,7 +23,7 @@ export class SentryEvent extends SentryItem {
       leaf: false,
     });
     this.command = {
-      command: "sentry-issues.showEvent",
+      command: "sentry-issues-viewer.showEvent",
       title: "Show Event Details",
       arguments: [
         {

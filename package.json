@@ -1,9 +1,10 @@
 {
-  "name": "sentry-issues",
+  "name": "sentry-issues-viewer",
   "displayName": "Sentry Issues",
   "description": "View sentry issues locally",
   "publisher": "QuentinN42",
   "version": "0.0.1",
+  "repository": "https://github.com/Escape-Technologies/sentry-issues-viewer",
   "engines": {
     "vscode": "^1.96.0"
   },
@@ -15,22 +16,22 @@
   "contributes": {
     "commands": [
       {
-        "command": "sentry-issues.refresh",
+        "command": "sentry-issues-viewer.refresh",
         "title": "Sentry: Refresh",
         "icon": "$(refresh)"
       },
       {
-        "command": "sentry-issues.filter",
+        "command": "sentry-issues-viewer.filter",
         "title": "Sentry: Filter Projects",
         "icon": "$(search)"
       },
       {
-        "command": "sentry-issues.reset",
+        "command": "sentry-issues-viewer.reset",
         "title": "Sentry: Reset configuration",
         "icon": "$(key)"
       },
       {
-        "command": "sentry-issues.showEvent",
+        "command": "sentry-issues-viewer.showEvent",
         "title": "Sentry: Show Event Details"
       }
     ],
@@ -60,17 +61,17 @@
     "menus": {
       "view/title": [
         {
-          "command": "sentry-issues.filter",
+          "command": "sentry-issues-viewer.filter",
           "when": "view == sentryIssuesSidebar.sidebar",
           "group": "navigation"
         },
         {
-          "command": "sentry-issues.refresh",
+          "command": "sentry-issues-viewer.refresh",
           "when": "view == sentryIssuesSidebar.sidebar",
           "group": "navigation"
         },
         {
-          "command": "sentry-issues.reset",
+          "command": "sentry-issues-viewer.reset",
           "when": "view == sentryIssuesSidebar.sidebar",
           "group": "navigation@1"
         }
@@ -79,12 +80,12 @@
     "configuration": {
       "title": "Sentry Issues",
       "properties": {
-        "sentry-issues.organization": {
+        "sentry-issues-viewer.organization": {
           "type": "string",
           "default": "",
           "description": "Sentry Organization Slug"
         },
-        "sentry-issues.url": {
+        "sentry-issues-viewer.url": {
           "type": "string",
           "default": "https://sentry.io",
           "description": "Sentry Instance URL"

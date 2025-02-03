@@ -1,8 +1,8 @@
 import * as vscode from "vscode";
-import { SentryTreeDataProvider } from "./vscode/sidebar/sidebar";
 import { CredentialsProvider } from "./vscode/creds";
 import { EventDetailsViewProvider } from "./vscode/sidebar/eventDetails";
-import { SentryEvent, SentryEventData } from "./vscode/sidebar/items/event";
+import { SentryEventData } from "./vscode/sidebar/items/event";
+import { SentryTreeDataProvider } from "./vscode/sidebar/sidebar";
 
 export function activate(context: vscode.ExtensionContext) {
   const logger = vscode.window.createOutputChannel("Sentry Issues", { log: true });
@@ -13,20 +13,20 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.window.registerTreeDataProvider("sentryIssuesSidebar.sidebar", treeDataProvider),
     vscode.window.registerWebviewViewProvider("sentryIssuesSidebar.eventDetails", eventDetailsProvider),
-    vscode.commands.registerCommand("sentry-issues.refresh", () => treeDataProvider.refresh()),
-    vscode.commands.registerCommand("sentry-issues.reset", async () => {
+    vscode.commands.registerCommand("sentry-issues-viewer.refresh", () => treeDataProvider.refresh()),
+    vscode.commands.registerCommand("sentry-issues-viewer.reset", async () => {
       await credProvider.reset();
       treeDataProvider.cleanCache();
       await treeDataProvider.refresh();
     }),
-    vscode.commands.registerCommand("sentry-issues.filter", async () => {
+    vscode.commands.registerCommand("sentry-issues-viewer.filter", async () => {
       const text = await vscode.window.showInputBox({
         prompt: "Filter projects",
         value: "",
       });
       treeDataProvider.updateFilter(text ?? "");
     }),
-    vscode.commands.registerCommand("sentry-issues.showEvent", (event: SentryEventData) => {
+    vscode.commands.registerCommand("sentry-issues-viewer.showEvent", (event: SentryEventData) => {
       eventDetailsProvider.showEvent(event);
     })
   );
