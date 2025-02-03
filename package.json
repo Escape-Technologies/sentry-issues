@@ -4,7 +4,11 @@
   "description": "View sentry issues locally",
   "publisher": "QuentinN42",
   "version": "0.0.1",
-  "repository": "https://github.com/Escape-Technologies/sentry-issues-viewer",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Escape-Technologies/sentry-issues"
+  },
+  "icon": "assets/sentry.png",
   "engines": {
     "vscode": "^1.96.0"
   },
