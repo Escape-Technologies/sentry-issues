@@ -26,3 +26,10 @@ You also have the folowing parameters:
 ### 0.0.1
 
 Initial release of the extension.
+
+### 0.0.2
+
+- Cleanup package.json
+- Add icon
+- Add bugs url
+- Add repository url
