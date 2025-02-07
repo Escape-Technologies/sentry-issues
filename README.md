@@ -52,3 +52,7 @@ Initial release of the extension.
 ### 0.0.3
 
 - Add `Get an API Key` documentation
+
+### 0.0.4
+
+- Allow lower vscode version
