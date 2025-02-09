@@ -45,12 +45,18 @@ export type SentryExceptionFrameVarsT = z.infer<typeof vars>;
 
 const breadcrumbs = z.object({
   type: z.literal("breadcrumbs"),
+  data: z.unknown(),
+});
+
+const message = z.object({
+  type: z.literal("message"),
+  data: z.unknown(),
 });
 
 export const SentryEventSchema = z.object({
   id: z.string(),
   dateCreated: z.string(),
-  entries: z.array(z.discriminatedUnion("type", [exception, breadcrumbs])),
+  entries: z.array(z.discriminatedUnion("type", [exception, breadcrumbs, message])),
   tags: z.array(z.object({ key: z.string(), value: z.string() })),
 });
 export type SentryEventT = z.infer<typeof SentryEventSchema>;
