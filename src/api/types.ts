@@ -16,8 +16,13 @@ export type SentryIssueT = z.infer<typeof SentryIssueSchema>;
 // https://zodjs.netlify.app/guide/recursive-types
 const literalSchema = z.string();
 type Literal = z.infer<typeof literalSchema>;
-type varsT = Literal | { [key: string]: varsT } | varsT[];
-const varsSchema: z.ZodType<varsT> = z.lazy(() => z.union([literalSchema, z.array(varsSchema), z.record(varsSchema)]));
+export type SentryExceptionFrameVarsT =
+  | Literal
+  | { [key: string]: SentryExceptionFrameVarsT }
+  | SentryExceptionFrameVarsT[];
+const varsSchema: z.ZodType<SentryExceptionFrameVarsT> = z.lazy(() =>
+  z.union([literalSchema, z.array(varsSchema), z.record(varsSchema)])
+);
 const vars = z.record(z.string(), varsSchema);
 
 const exception = z.object({
@@ -31,8 +36,9 @@ const exception = z.object({
           frames: z.array(
             z.object({
               absPath: z.string(),
-              lineno: z.number().optional(),
+              lineNo: z.number().optional(),
               vars: vars.nullable(),
+              inApp: z.boolean().optional(),
             })
           ),
         }),
@@ -41,7 +47,6 @@ const exception = z.object({
   }),
 });
 export type SentryExceptionFrameT = z.infer<typeof exception>["data"]["values"][number]["stacktrace"]["frames"][number];
-export type SentryExceptionFrameVarsT = z.infer<typeof vars>;
 
 const breadcrumbs = z.object({
   type: z.literal("breadcrumbs"),

@@ -1,12 +1,12 @@
 import * as vscode from "vscode";
 import { z, ZodType } from "zod";
-import { getNextPage } from "./link";
-import { SentryProjectSchema, SentryIssueSchema, SentryEventSchema } from "./types";
 import { CredentialsProvider } from "../vscode/creds";
+import { getNextPage } from "./link";
+import { SentryEventSchema, SentryIssueSchema, SentryProjectSchema } from "./types";
 
 export class SentryPuller {
   constructor(
-    private readonly logger: vscode.LogOutputChannel,
+    public readonly logger: vscode.LogOutputChannel,
     private readonly credProvider: CredentialsProvider
   ) {}
 
@@ -39,15 +39,22 @@ export class SentryPuller {
   private async GET<S extends ZodType>(
     url: string,
     schema: S,
-    old_res: Array<z.infer<S>> = []
+    max_res: number = 0,
+    data: Array<z.infer<S>> = []
   ): Promise<Array<z.infer<S>>> {
     const response = await this.fetch(url);
     this.logger.info(`GET ${url} : ${response.status}`);
     const next = getNextPage(response.headers.get("link"));
     const txt = await response.text();
-    this.logger.info(JSON.stringify(JSON.parse(txt), null, 2));
-    const data = [...old_res, schema.parse(JSON.parse(txt))];
-    return next ? this.GET(next, schema, data) : data;
+    for (const obj of JSON.parse(txt)) {
+      const parsed = schema.safeParse(obj);
+      if (parsed.success) data.push(parsed.data);
+      else {
+        this.logger.error(`Failed to parse ${obj} : ${parsed.error}`);
+      }
+      if (max_res !== 0 && data.length >= max_res) return data;
+    }
+    return next ? this.GET(next, schema, max_res, data) : data;
   }
 
   async GETProjects() {
@@ -55,7 +62,7 @@ export class SentryPuller {
     if (!creds) {
       return [];
     }
-    return (await this.GET(`${creds.url}/api/0/projects/`, z.array(SentryProjectSchema))).flat();
+    return await this.GET(`${creds.url}/api/0/projects/`, SentryProjectSchema);
   }
 
   async GETIssues(projectId: string) {
@@ -63,12 +70,7 @@ export class SentryPuller {
     if (!creds) {
       return [];
     }
-    return (
-      await this.GET(
-        `${creds.url}/api/0/projects/${creds.organization}/${projectId}/issues/`,
-        z.array(SentryIssueSchema)
-      )
-    ).flat();
+    return await this.GET(`${creds.url}/api/0/projects/${creds.organization}/${projectId}/issues/`, SentryIssueSchema);
   }
 
   async GETEvents(issueId: string) {
@@ -76,11 +78,10 @@ export class SentryPuller {
     if (!creds) {
       return [];
     }
-    return (
-      await this.GET(
-        `${creds.url}/api/0/issues/${issueId}/events/?full=true&environment=prod`,
-        z.array(SentryEventSchema)
-      )
-    ).flat();
+    return await this.GET(
+      `${creds.url}/api/0/issues/${issueId}/events/?full=true&environment=prod`,
+      SentryEventSchema,
+      10
+    );
   }
 }

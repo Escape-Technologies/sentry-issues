@@ -39,6 +39,8 @@ export class SentryEvent extends SentryItem {
     const exception = this.event.entries.find((entry) => entry.type === "exception")?.data.values;
     if (!exception) return [];
     const frames = exception.flatMap((entry) => entry.stacktrace.frames);
-    return frames.map((frame) => new SentryEventFrame(this.puller, frame, this.event, this.issue, this.project));
+    return Promise.all(
+      frames.map((frame) => SentryEventFrame.new(this.puller, frame, this.event, this.issue, this.project))
+    );
   }
 }
