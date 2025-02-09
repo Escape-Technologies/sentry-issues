@@ -3,7 +3,7 @@
   "displayName": "Sentry Issues Viewer",
   "description": "View sentry issues locally",
   "publisher": "QuentinN42",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "repository": {
     "type": "git",
     "url": "https://github.com/Escape-Technologies/sentry-issues"
