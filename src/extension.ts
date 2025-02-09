@@ -10,15 +10,21 @@ export function activate(context: vscode.ExtensionContext) {
   const treeDataProvider = new SentryTreeDataProvider(logger, credProvider);
   const eventDetailsProvider = new EventDetailsViewProvider(context.extensionUri);
 
+  const refresh = async () => {
+    await credProvider.forceConfigure();
+    treeDataProvider.cleanCache();
+    await treeDataProvider.refresh();
+  };
+  const reset = async () => {
+    await credProvider.reset();
+    await refresh();
+  };
+
   context.subscriptions.push(
     vscode.window.registerTreeDataProvider("sentryIssuesSidebar.sidebar", treeDataProvider),
     vscode.window.registerWebviewViewProvider("sentryIssuesSidebar.eventDetails", eventDetailsProvider),
-    vscode.commands.registerCommand("sentry-issues-viewer.refresh", () => treeDataProvider.refresh()),
-    vscode.commands.registerCommand("sentry-issues-viewer.reset", async () => {
-      await credProvider.reset();
-      treeDataProvider.cleanCache();
-      await treeDataProvider.refresh();
-    }),
+    vscode.commands.registerCommand("sentry-issues-viewer.refresh", refresh),
+    vscode.commands.registerCommand("sentry-issues-viewer.reset", reset),
     vscode.commands.registerCommand("sentry-issues-viewer.filter", async () => {
       const text = await vscode.window.showInputBox({
         prompt: "Filter projects",
