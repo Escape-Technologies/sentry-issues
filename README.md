@@ -38,21 +38,13 @@ You also have the folowing parameters:
 
 ## Release Notes
 
-### 0.0.1
+### Pre Release (0.0.x)
 
 Initial release of the extension.
-
-### 0.0.2
 
 - Cleanup package.json
 - Add icon
 - Add bugs url
 - Add repository url
-
-### 0.0.3
-
 - Add `Get an API Key` documentation
-
-### 0.0.4
-
 - Allow lower vscode version
